@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    highline (1.7.10)
+    ruby-mud (0.0.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  highline
+  ruby-mud
+
+BUNDLED WITH
+   1.15.4
