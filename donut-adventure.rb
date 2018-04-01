@@ -36,6 +36,8 @@ class String
             "\e[91m#{self}\e[0m"
         elsif icing =="lemon"
             "\e[93m#{self}\e[0m"
+        elsif icing == "pistachio"
+            "\e[92m#{self}\e[0m"
         end
     end
 end
@@ -215,10 +217,80 @@ def encounter(player, foe)
                 menu.choice(:music) do $prize = "music" end
             end
             if $prize == "diamond"
-                
+                puts "
+                      *********
+                     ***********
+                    *************
+                      *********
+                        *****
+                          *"
             elsif $prize == "tophat"
-            
+                puts "
+                      ********
+                      ********
+                      ********
+                      ********
+                    ************"
             elsif $prize == "pistachio"
+                        puts "      MM".color("pistachio")
+            puts "     MMMM".color("pistachio")
+            puts "    MMMMMM".color("pistachio")
+            
+            print "M  "            
+            print "MMMMMMMM".color("pistachio")
+            print "  M"
+            puts
+            
+            print "MM "            
+            print "MMMMMMMM".color("pistachio")
+            print " MM"
+            puts
+            
+            print "MM "            
+            print "MMMMMMMM".color("pistachio")
+            print " MM"
+            puts
+            
+            print "MMM"            
+            print "MMMMMMMM".color("pistachio")
+            print "MMM"
+            puts
+            
+            print "MMMM"            
+            print "MMMMMM".color("pistachio")
+            print "MMMM"
+            puts
+            
+            print "MMMMM"            
+            print "MMMM".color("pistachio")
+            print "MMMMM"
+            puts
+            
+            print "MMMMMM"            
+            print "MM".color("pistachio")
+            print "MMMMMM"
+            puts
+            
+            print "MMMMMMMMMMMMMM"
+            puts
+            print "MMMMMMMMMMMMMM"
+            puts
+            
+            print " MMMMMM"            
+            print "MMMMMM"
+            puts
+            
+            print "  MMMMMMMMMM"            
+            puts
+            
+            print "   MMMMMMMM"            
+            puts
+            
+            print "    MMMMMM"            
+            puts
+            
+            print "      MM"            
+            puts
             
             elsif $prize == "music"
                 puts "All time faves selected from my thirty something or so playlists
