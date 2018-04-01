@@ -2,7 +2,6 @@
 
 require 'highline'
 require 'ruby_mud'
-require 'colorize'
 
 class Foes
     attr_reader :foe_type, :foe_name, :foe_damage, :foe_accuracy
@@ -22,28 +21,33 @@ class Foes
     end
 end
 
-dinosaur = Foes.new("dinosaur","Kitty",1,5,5)
+dinosaur = Foes.new("dinosaur","Kitty",2,5,5)
 human = Foes.new("hungry human","Taylor Want",3,4,8)
 rock = Foes.new("rock","Rocky",4,8,3)
 pistachio = Foes.new("pistachio","Gloria",7,3,6)
 
+class String
+    def color(icing)
+        if icing == "glaze"
+            "\e[37m#{self}\e[0m"
+        elsif icing =="chocolate"
+            "\e[33m#{self}\e[0m"
+        elsif icing =="strawberry"
+            "\e[91m#{self}\e[0m"
+        elsif icing =="lemon"
+            "\e[93m#{self}\e[0m"
+        end
+    end
+end
+
 class Donut
-    attr_reader :name, :icing, :textcolor
+    attr_reader :name, :icing
     attr_accessor :self_defense, :health, :attack_damage, :evasion
     def initialize(name,icing,self_defense)
         @name = name
         @icing = icing
         @self_defense = self_defense
         @health = 10
-        if @icing == "glaze"
-            @textcolor = ":background => :white"
-        elsif @icing == "chocolate"
-            @textcolor = ":background => :yellow"
-        elsif @icing == "stawberry"
-            @textcolor = ":background => :light_red"
-        elsif @icing == "lemon"
-            @textcolor = ":background => :light_yellow"
-        end
         if @self_defense == "spear"
             @attack_damage = 6
             @evasion = 3
@@ -62,7 +66,7 @@ end
 
 
 def beginning()
-    puts "Dear donut owner, your little pretty mascot is about to suffer a dangerous encounter with one enemy. We are sad to announce that your donut may lose their life. If you refuse to let your mascot fight, leave this game immediately. Would you like to stay and be a brave warrior?"
+    puts "Dear donut owner, your little pretty friend is about to suffer a dangerous encounter with several enemies. We are sad to announce that your donut may lose their life. If you refuse to let your mascot fight, leave this game immediately. Would you like to stay and be a brave warrior?"
         answer = gets.chomp.downcase
         puts
     if answer != "yes"
@@ -81,23 +85,22 @@ def beginning()
             menu.index_suffix = ") "
         # menu.index_color = :pink              # override default color of index
                                                # you can also use constants like :blue
-            menu.prompt = "What is your donut's icing?"
-            menu.choice(:glaze).colorize(:background => :white) do $icing = "glaze" end
-            menu.choice(:chocolate).colorize(:background => :yellow) do $icing = "chocolate" end
-            menu.choice(:strawberry).colorize(:background => :light_red) do $icing = "stawberry" end
-            menu.choice(:lemon).colorize(:background => :light_yellow) do $icing = "lemon" end
+            menu.choice(:glaze) do $icing = "glaze" end
+            menu.choice(:chocolate) do $icing = "chocolate" end
+            menu.choice(:strawberry) do $icing = "strawberry" end
+            menu.choice(:lemon) do $icing = "lemon" end
         end
         puts
         
+        puts "What is your donut's weapon?"
         weaponchoice = HighLine.new
         # HighLine::Menu.index_color   = :rgb_99ccaa # set default index color
         
         weaponchoice.choose do |menu|
             menu.index        = :letter
             menu.index_suffix = ") "
-        # menu.index_color = :pink              # override default color of index
-                                               # you can also use constants like :blue
-            menu.prompt = "What is your donut's weapon?"
+        # menu.index_color = :pink          # override default color of index
+                                            # you can also use constants like :blue
             menu.choice(:spear) do $weapon = "spear" end
             menu.choice(:sword) do $weapon = "sword" end
             menu.choice(:swatter, "fly swatter") do $weapon = "fly swatter" end
@@ -122,7 +125,11 @@ end
 
 
 def encounter(player, foe)
-    puts "An enemy has appeared! It is a #{foe.foe_type} named #{foe.foe_name}. It will do #{foe.foe_damage} damage. It has #{foe.foe_health} health. What will you do?"
+    if foe.foe_type == "pistachio"
+        puts "The final enemy has appeared! It is a #{foe.foe_type} named #{foe.foe_name}. It will do #{foe.foe_damage} damage. It has #{foe.foe_health} health. What will you do, brave warrior?"
+    else
+        puts "An enemy has appeared! It is a #{foe.foe_type} named #{foe.foe_name}. It will do #{foe.foe_damage} damage. It has #{foe.foe_health} health. What will you do?"
+    end
     while foe.foe_health > 0
         puts "Dodge, Block, or Attack?"
         action = gets.chomp.downcase
@@ -132,51 +139,107 @@ def encounter(player, foe)
             roll = 1 + rand(10)
             if foe.foe_accuracy >= roll
                 puts "#{foe.foe_name} attacked!"
-                puts "#{player.name} took #{foe.foe_damage} damage.".colorize(player.textcolor)
+                puts "#{player.name} took #{foe.foe_damage} damage.".color(player.icing)
                 player.health = player.health - foe.foe_damage
+                if 0 >= player.health 
+                    player.health = 0
+                end
                 # dilly's health after the encounter
-                puts "#{player.name} has #{player.health} health remaining.".colorize(player.textcolor)
-            elsif
+                puts "#{player.name} has #{player.health} health remaining.".color(player.icing)
+            else
                 puts "#{foe.foe_name}'s attack missed!"
-                puts "#{player.name} took no damage!".colorize(player.textcolor)
+                puts "#{player.name} took no damage!".color(player.icing)
             end
-            puts "#{player.name} dealt #{player.attack_damage} damage to the #{foe.foe_type}!".colorize(player.textcolor)
-            foe.foe_health = foe.foe_health - player.attack_damage
-            puts "#{foe.foe_name} has #{foe.foe_health} health remaining."
+            if player.health > 0
+                puts "#{player.name} dealt #{player.attack_damage} damage to the #{foe.foe_type}!".color(player.icing)
+                foe.foe_health = foe.foe_health - player.attack_damage
+                if 0 >= foe.foe_health 
+                    foe.foe_health = 0
+                end
+                puts "#{foe.foe_name} has #{foe.foe_health} health remaining."
+            end
             puts
         end
         if action == "block"
             puts "#{foe.foe_name} attacked!"
-            puts "#{player.name} took half damage!".colorize(player.textcolor)
+            puts "#{player.name} took half damage!".color(player.icing)
             player.health = player.health - (foe.foe_damage/2)
             player.health = player.health.round
+            if 0 >= player.health 
+                player.health = 0
+            end
             # dilly's health after the encounter
-            puts "#{player.name} has #{player.health} health remaining.".colorize(player.textcolor)
+            puts "#{player.name} has #{player.health} health remaining.".color(player.icing)
             puts
         end
         if action == "dodge"
             roll = 1 + rand(10)
             if player.evasion >= roll
-                puts "#{player.name} dodged the attack!".colorize(player.textcolor)
-                puts "#{player.name} took no damage!".colorize(player.textcolor)
-            elsif
-                puts "#{player.name} couldn't dodge the attack!".colorize(player.textcolor)
-                puts "#{player.name} took #{foe.foe_damage} damage!".colorize(player.textcolor)
+                puts "#{player.name} dodged the attack!".color(player.icing)
+                puts "#{player.name} took no damage!".color(player.icing)
+                puts
+            else
+                puts "#{player.name} couldn't dodge the attack!".color(player.icing)
+                puts "#{player.name} took #{foe.foe_damage} damage!".color(player.icing)
                 player.health = player.health - foe.foe_damage
+                if 0 >= player.health 
+                    player.health = 0
+                end
                 # dilly's health after the encounter
-                puts "#{player.name} has #{player.health} health remaining.".colorize(player.textcolor)
+                puts "#{player.name} has #{player.health} health remaining.".color(player.icing)
                 puts
             end
         end
     end
+    if 0 >= player.health 
+        puts "Oh no! #{player.name} has no health left!"
+        puts "#{player.name} fainted"
+        abort("GAME OVER")
+    end
     if 0 >= foe.foe_health 
         puts "#{foe.foe_name} the #{foe.foe_type} was defeated!"
-        puts "Continue?"
-        cont = gets.chomp.downcase
-        if cont == "yes"
-            puts "Good. Let's keep going."
+        if foe.foe_type == "pistachio"
+            puts "#{player.name} is victorious! You have triumphed over all the enemies! Congratulations!"
+            puts "Collect your prize!"
+            prizechoice = HighLine.new
+            # HighLine::Menu.index_color   = :rgb_99ccaa # set default index color
+            
+            prizechoice.choose do |menu|
+                menu.index        = :letter
+                menu.index_suffix = ") "
+            # menu.index_color = :pink          # override default color of index
+                                                # you can also use constants like :blue
+                menu.choice(:diamond) do $prize = "diamond" end
+                menu.choice(:tophat) do $prize = "tophat" end
+                menu.choice(:pistachio) do $prize = "pistachio" end
+                menu.choice(:music) do $prize = "music" end
+            end
+            if $prize == "diamond"
+                
+            elsif $prize == "tophat"
+            
+            elsif $prize == "pistachio"
+            
+            elsif $prize == "music"
+                puts "All time faves selected from my thirty something or so playlists
+                    Now - Joywave
+                    Cherry - Chromatics
+                    Hellboy - Seth Sentry
+                    Cigarettes & Loneliness - Chet Faker
+                    Shoulders & Arms - Tokyo Police Club"
+            end
         else
-            abort("Bye. Have a good one.")
+            puts "#{player.name} gained #{foe.foe_damage} health for defeating the #{foe.foe_type}.".color(player.icing)
+            player.health = player.health + foe.foe_damage
+            puts "#{player.name} has #{player.health} health remaining.".color(player.icing)
+            puts
+            puts "Continue?"
+            cont = gets.chomp.downcase
+            if cont == "yes"
+                puts "Good. Let's keep going."
+            else
+                abort("Bye. Have a good one.")
+            end
         end
     end
 end
@@ -185,4 +248,7 @@ end
 puts beginning()
 
 puts encounter($player, dinosaur)
+puts encounter($player, human)
+puts encounter($player, rock)
+puts encounter($player, pistachio)
 
